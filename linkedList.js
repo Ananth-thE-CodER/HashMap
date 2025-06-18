@@ -75,4 +75,18 @@ export class LinkedList {
         newNode.next = nextNode;
         this.size++;
     }
+
+    unWrap() {
+        let nodeArray = [];
+        let i = 0;
+        let node = this.head;
+        while (i <= this.size) {
+            if (node) {
+                nodeArray.push(node)
+            }
+            node = node.next;
+            i++;
+        }
+        return nodeArray;
+    }
 }
