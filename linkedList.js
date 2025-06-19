@@ -50,10 +50,14 @@ export class LinkedList {
                 break;
             }
             node = node.next;
-            if (index == null) index = 0;
+            i++;
+            if (i <= this.size - 1 && index == null) index = 0;
             index++;
         }
-        return index;
+        if (found) {
+            return index;
+        }
+        return null;
     }
 
     insertAt(value, index) {
@@ -80,7 +84,7 @@ export class LinkedList {
         let nodeArray = [];
         let i = 0;
         let node = this.head;
-        while (i <= this.size) {
+        while (i <= this.size - 1) {
             if (node) {
                 nodeArray.push(node)
             }

@@ -50,8 +50,8 @@ export class HashMap {
             let nodeList = this.table[bucket].unWrap();
             for (let node of nodeList) {
                 let dataObj = JSON.parse(node.value);
-                if (Object.keys(dataObj)[0] == key) {
-                    return Object.values(dataObj)[0];
+                if (dataObj[Object.keys(dataObj)[0]] == key) {
+                    return Object.values(dataObj)[1];
                 }
             }
         }
@@ -137,6 +137,23 @@ export class HashMap {
             }
         })
         return values;
+    }
+
+    entries() {
+        let entires = [];
+        this.table.forEach((List) => {
+            let i = 0;
+            if (List.getSize()) {
+                let node = List.head;
+                let i = 0;
+                while (i <= List.getSize() - 1) {
+                    entires.push(Object.values(JSON.parse(node.value)));
+                    i++;
+                    node = node.next;
+                }
+            }
+        })
+        return entries;
     }
 
     reHash() {
