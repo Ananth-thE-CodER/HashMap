@@ -36,13 +36,23 @@ export class LinkedList {
         return this.size;
     }
 
-    find(value) {
+    find(value, checkKey=true) {
         let i = 0;
         let found = false;
         let index = null;
         let node = this.head;
+        let key = null;
+        let valObj = JSON.parse(value);
+        let valKey = valObj.key;
         while (i <= this.size - 1) {
-            if (node.value == value) {
+            if (checkKey) {
+                let dataObj = JSON.parse(node.value);
+                key = dataObj.key;
+            }
+            else {
+                key = node.value;
+            }
+            if (key == valKey) {
                 if (index == null) {
                     index = 0;
                 }
@@ -61,7 +71,7 @@ export class LinkedList {
     }
 
     insertAt(value, index) {
-        if (index < 0) console.log("Please enter a positive index.")
+        if (index < 0) console.log("Please enter a positive index.");
         let i = 1;
         let node = this.head;
         let newNode = new Node(value);
@@ -80,15 +90,48 @@ export class LinkedList {
         this.size++;
     }
 
+    removeAt(index) {
+        if (index < 0) console.log("Please enter a positive index.")
+        let i = 1;
+        let node = this.head;
+        if (index == 0) {
+            this.head = this.head.next;
+            this.size--;
+            this.tail = null;
+            return;
+        }
+        while (i < index) {
+            node = node.next;
+            i++;
+        }
+        node.next = node.next.next;
+        this.size--;
+    }
+
+    updateAt(value, index) {
+        if (index < 0) console.log("Please enter a positive index.");
+        if (index < this.size - 1) console.log("Please enter a valid index.");
+
+        let i = 0;
+        let node = this.head;
+        while (i <= index) {
+            if (this.size != 1) {
+                node = node.next;
+            }
+            i++;
+        }
+        node.value = value;
+    }
+
     unWrap() {
         let nodeArray = [];
         let i = 0;
         let node = this.head;
         while (i <= this.size - 1) {
             if (node) {
-                nodeArray.push(node)
+                nodeArray.push(node);
+                node = node.next;
             }
-            node = node.next;
             i++;
         }
         return nodeArray;

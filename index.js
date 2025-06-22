@@ -25,5 +25,25 @@ test.set("peacock", "grey") // P is collision
 
 console.log(test.get('lion'));
 
+test.set("peacock", "white");
 
+console.log(test.get("peacock"));
 
+console.log("has(): true", test.has("zebra"));
+console.log("has(): false", test.has("hulk"));
+
+console.log("keys()", test.keys());
+
+console.log("values()", test.values());
+
+test.remove("quacker");
+
+console.log("keys()", test.keys());
+
+console.log("length()", test.length());
+
+console.log("entries()", test.entries());
+
+test.clear();
+
+console.log("entries()", test.entries());

@@ -24,23 +24,23 @@ export class HashMap {
 
         if ((this.bucketCount / this.capacity) > this.loadFactor) {
             this.expandHashMap();
-            this.reHash();
         }
         // Check if the bucket contains any data
         if (this.table[bucket].getSize() > 0) { // Linear probing LL.
             let index = this.table[bucket].find(data);
-            if (index) {
-                this.table[bucket].insertAt(data, index);  // This means that this is an update operation, not a collision.
+            if (index != null) {
+                this.table[bucket].updateAt(data, index);  // This means that this is an update operation, not a collision.
             }
             else {
                 this.table[bucket].append(data);  // Collision
+                this.len++;
             }
         }
         else {  // No data
             this.table[bucket].append(data);
             this.bucketCount++;
+            this.len++;
         }
-        this.len++;
     }
     
     get(key) {
@@ -65,7 +65,7 @@ export class HashMap {
             let nodeList = this.table[bucket].unWrap();
             for (let node of nodeList) {
                 let dataObj = JSON.parse(node.value);
-                if (Object.keys(dataObj)[0] == key) {
+                if (Object.values(dataObj)[0] == key) {
                     return true;
                 }
             }
@@ -84,15 +84,10 @@ export class HashMap {
             let prevNode = null;
             while (i < size) {
                 let dataObj = JSON.parse(node.value);
-                if (Object.keys(dataObj)[0] == val) {
-                    if (i == 0) {
-                        this.table[bucket].head = this.table[bucket].head.next;
-                        return true;
-                    }
-                    else {
-                        prevNode.next = node.next;
-                        return true;
-                    }
+                if (Object.values(dataObj)[0] == key) {
+                    this.table[bucket].removeAt(i);
+                    this.len--;
+                    return true;
                 }
                 prevNode = node;
                 node = node.next;
@@ -108,22 +103,24 @@ export class HashMap {
 
     clear() {
         this.capacity = 16;
-        this.table = Array.from({ length: capacity }, () => new LinkedList());
+        this.table = Array.from({ length: this.capacity }, () => new LinkedList());
         this.bucketCount = 0;
         this.len = 0; 
     }
 
     keys() {
-        let keys = [];
+        let reskeys = [];
         this.table.forEach((List) => {
             let node = List.head;
             let size = List.getSize();
             let i = 0;
             while (i <= size - 1) {
-                keys.concat(Object.keys(JSON.parse(node.value)));
+                reskeys.push(Object.values(JSON.parse(node.value))[0]);
+                node = node.next;
+                i++;
             }
         })
-        return keys;
+        return reskeys;
     }
 
     values() {
@@ -133,21 +130,22 @@ export class HashMap {
             let size = List.getSize();
             let i = 0;
             while (i <= size - 1) {
-                values.concat(Object.values(JSON.parse(node.value)));
+                values.push(Object.values(JSON.parse(node.value))[1]);
+                node = node.next;
+                i++;
             }
         })
         return values;
     }
 
     entries() {
-        let entires = [];
+        let entries = [];
         this.table.forEach((List) => {
-            let i = 0;
             if (List.getSize()) {
                 let node = List.head;
                 let i = 0;
                 while (i <= List.getSize() - 1) {
-                    entires.push(Object.values(JSON.parse(node.value)));
+                    entries.push(Object.values(JSON.parse(node.value)));
                     i++;
                     node = node.next;
                 }
@@ -156,19 +154,20 @@ export class HashMap {
         return entries;
     }
 
-    reHash() {
-        this.table.forEach((List) => {
+    reHash(oldData) {
+        oldData.forEach((List) => {
             let size = List.getSize()
             if (size > 0) {
-                for (var i=0; i < size; i++) {
-                    let nodeList = List.unWrap();
-                    for (let node of nodeList) {
-                        let dataObj = JSON.parse(node.value);
-                        let key = Object.keys(dataObj);
-                        let val = Object.values(dataObj)
-                        this.set(key[0], val[0]);
-                    }
+                // for (var i=0; i < size; i++) {
+                let nodeList = List.unWrap();
+                for (let node of nodeList) {
+                    let dataObj = JSON.parse(node.value);
+                    let vals = Object.values(dataObj);
+                    // let key = Object.keys(dataObj);
+                    // let val = Object.values(dataObj)
+                    this.set(vals[0], vals[1]);
                 }
+                // }
             }
         })
     }
@@ -176,7 +175,10 @@ export class HashMap {
     expandHashMap() {
         this.capacity *= 2;
         this.bucketCount = 0;
-        this.length = 0;
+        this.len = 0;
+        let oldData = this.table;
+        this.table = Array.from({ length: this.capacity }, () => new LinkedList());
+        this.reHash(oldData);
     }
 
 }
